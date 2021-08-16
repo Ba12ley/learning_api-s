@@ -3,6 +3,7 @@ from rest_framework.views import APIView #a wrapper for class based api views
 from rest_framework.decorators import api_view #a wrapper for function based api views goto line 64
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from .serializers import PostSerializer
 from .models import Post
 from django.views.decorators.csrf import csrf_exempt
@@ -18,6 +19,36 @@ class PostView(APIView):
         serializer = PostSerializer(queryset, many=True)
         # if serializer.is_valid():
         return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = PostSerializer(data=request.data) # using data not post
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk, *args, **kwargs):
+
+        # try catch to see if post exists
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return HttpResponse(status=400)
+
+
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return HttpResponse(status=400)
+        post.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 # decorated for csrf exemption
