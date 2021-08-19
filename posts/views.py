@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from rest_framework import viewsets
 from rest_framework.views import APIView #a wrapper for class based api views
 from rest_framework.decorators import api_view #a wrapper for function based api views goto line 64
 from rest_framework.permissions import AllowAny
@@ -6,8 +9,6 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from .serializers import PostSerializer
 from .models import Post
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 
 class PostView(APIView):
@@ -39,7 +40,7 @@ class PostView(APIView):
         serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=HTTP_201_CREATED)
+            return Response(serializer.data)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, *args, **kwargs):
@@ -92,7 +93,13 @@ def post_detail(request, pk):
         post.delete()
         return HttpResponse(status=204)
 
-@api_view(['GET', 'POST']) #pass in here the request methods you wish to deal with
-def exampleOfWrapper(request):
-    if request.method == 'GET':
-        pass
+# @api_view(['GET', 'POST']) #pass in here the request methods you wish to deal with
+# def exampleOfWrapper(request):
+#     if request.method == 'GET':
+#         pass
+
+#This gives all the views created above, but in a generic manner.  See urls.py for routing
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (AllowAny, )
