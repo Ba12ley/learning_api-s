@@ -1,13 +1,14 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
-
+User = get_user_model()
 
 class Post(models.Model):
     CATEGORY_CHOICES = (
         ('Dj', 'Django'),
         ('R', 'Ruby')
     )
-
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     custom_id = models.IntegerField(blank=True, null=True)
     category = models.CharField(max_length=3, blank=True, null=True, choices=CATEGORY_CHOICES)

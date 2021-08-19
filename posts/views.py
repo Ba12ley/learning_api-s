@@ -4,12 +4,18 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
 from rest_framework.views import APIView #a wrapper for class based api views
 from rest_framework.decorators import api_view #a wrapper for function based api views goto line 64
-from rest_framework.permissions import AllowAny
+from rest_framework import mixins
+from rest_framework import generics
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
-from .serializers import PostSerializer
+from .serializers import PostSerializer, OwnerSerializer
 from .models import Post
 from rest_framework.parsers import JSONParser
+from .permissions import IsOwnerPermission # custom permissions added in permissions.py use in the class based view
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class PostView(APIView):
 
@@ -93,6 +99,7 @@ def post_detail(request, pk):
         post.delete()
         return HttpResponse(status=204)
 
+<<<<<<< HEAD
 # @api_view(['GET', 'POST']) #pass in here the request methods you wish to deal with
 # def exampleOfWrapper(request):
 #     if request.method == 'GET':
@@ -103,3 +110,52 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (AllowAny, )
+=======
+@api_view(['GET', 'POST']) #pass in here the request methods you wish to deal with
+def exampleOfWrapper(request):
+    if request.method == 'GET':
+        pass
+
+#add in the mixin arguement before the generics.  The mixin allows to inherit methods from the mixin classes, multiple mixins can be used
+class PostMixinListView(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        mixins.UpdateModelMixin,
+                        mixins.RetrieveModelMixin,
+                        mixins.DestroyModelMixin,
+                        generics.GenericAPIView):
+    #using the mixin removes the repitition of the below code
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.put(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+
+# using generic view available, looks like below and the names give away the view.  Django reduces the logic for CRUD
+#generics have a useful permission_classes built in.  import from rest_framework.permissions
+class PostListView(generics.ListAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (IsAuthenticated, IsOwnerPermission )
+
+class PostDetailView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (IsAuthenticated, IsOwnerPermission)
+
+class PostDestroView(generics.DestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class OwnerDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = OwnerSerializer
+>>>>>>> f67c301fbfc3e90900e56d03f654736db4312fdf
