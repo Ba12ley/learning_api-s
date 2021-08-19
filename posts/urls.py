@@ -14,6 +14,6 @@ post_detail = PostViewSet.as_view({
 })
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
     path('custom/', post_detail, name='custom')
 ]
