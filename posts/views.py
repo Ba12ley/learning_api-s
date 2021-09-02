@@ -99,18 +99,12 @@ def post_detail(request, pk):
         post.delete()
         return HttpResponse(status=204)
 
-<<<<<<< HEAD
+
 # @api_view(['GET', 'POST']) #pass in here the request methods you wish to deal with
 # def exampleOfWrapper(request):
 #     if request.method == 'GET':
 #         pass
 
-#This gives all the views created above, but in a generic manner.  See urls.py for routing
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = (AllowAny, )
-=======
 @api_view(['GET', 'POST']) #pass in here the request methods you wish to deal with
 def exampleOfWrapper(request):
     if request.method == 'GET':
@@ -158,4 +152,9 @@ class PostDestroView(generics.DestroyAPIView):
 class OwnerDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = OwnerSerializer
->>>>>>> f67c301fbfc3e90900e56d03f654736db4312fdf
+
+#This gives all the views created above, but in a generic manner.  See urls.py for routing
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (AllowAny, )
