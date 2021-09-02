@@ -19,15 +19,12 @@ from posts.views import PostView, post_list, post_detail, PostMixinListView, Pos
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-<<<<<<< HEAD
     path('api/posts/', PostView.as_view(), name='post-list'),
     path('api/', include('posts.urls')),
-=======
     #path('api/posts/', PostView.as_view(), name='post-list'),
     path('api/posts/', PostMixinListView.as_view(), name='post-list'),
     #path('api/posts/<int:pk>', PostDetailView.as_view(), name='post-detail'),
     path('api/posts/<int:pk>', OwnerDetailView.as_view(), name='owner-detail'),
->>>>>>> f67c301fbfc3e90900e56d03f654736db4312fdf
     # path('api/post-list', post_list, name='post-list'),
     #path('api/posts/<int:pk>', PostView.as_view(), name='post-detail')
-]
+
